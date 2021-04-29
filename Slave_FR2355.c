@@ -1,6 +1,6 @@
 /*I2C demo program to read a single byte of data from from a slave. Master is an MSP430FR5969 Launchpad.
  * Slave is a MSP430FR2355 Launchpad. If the master reads data byte = 0x03, flash green LED.
- * Otherwise flash red LED. These LEDs also toggle on the slave.
+ * Otherwise flash red LED. Corresponding LEDs also toggle on the slave.
  * Slave is held in LPM4 and polled at rate set by the VLO timer. I2C clock supplied by master. This is the SLAVE code.
  * */
 #include <msp430.h> 
@@ -32,7 +32,7 @@ int main(void)
     UCB0IE |=UCTXIE0; //Enable start interrupt
     while(1){
         LPM4; //Wait in low-power mode for master interrupt
-        Data = NewData; //Master interrupt occurred. Send single data byte to master
+        Data = NewData; //Master interrupt occurred. Send single data byte to master from slave
         LPM0; //Wait for stop bit in LPM0
         while (UCB0CTL1 & UCTXSTP); // Ensure stop condition sent
         //Toggle the data sent to master and LEDs on slave Launchpad
