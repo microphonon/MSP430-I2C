@@ -1,19 +1,16 @@
 /*I2C demo program to send a single byte of data from from master to slave. Master is an MSP430FR5969 Launchpad.
   Slave is a MSP430FR2355 Launchpad. If the master sends data byte = 0x01, flash green LED;
   otherwise flash red LED. Slave is polled at rate set by the VLO timer. I2C is on SMCLK. This is the MASTER code.
-  */
+  P1.6  UCB0SDA with 10k pullup
+  P1.7  UCB0SCL with 10k pullup
+ */
 #include <msp430.h> 
 #include <stdio.h>
 #include <stdint.h>
-/*
-P1.6  UCB0SDA with 10k pullup
-P1.7  UCB0SCL with 10k pullup
- */
 # define PERIOD 20000 //Samping period. 10000 count is approximately 1 second; maximum is 65535
 volatile uint8_t Control_Byte;
 
 void main(void) {
-
     WDTCTL = WDTPW | WDTHOLD;   //Stop watchdog timer
 
     PM5CTL0 &= ~LOCKLPM5; //Unlocks GPIO pins at power-up
@@ -39,7 +36,7 @@ void main(void) {
     UCB0CTLW1 |=  UCASTP_2; //Automatic stop generation when byte counter is hit
     UCB0TBCNT = UCTBCNT0; //Set counter to 1-byte
     UCB0BRW = 10;  //Divide SMCLK by 10 to get ~100 kHz
-    UCB0I2CSA = 0x77; // FR2355 address
+    UCB0I2CSA = 0x77; // FR2355 address (slave)
     UCB0CTLW0 &= ~UCSWRST; // Clear reset
 
     _BIS_SR(GIE); //Enable global interrupts
@@ -81,8 +78,8 @@ __interrupt void USCI_B0_ISR(void)
         case 16: break;         // Vector 16: TXIFG2
         case 18: break;         // Vector 18: RXIFG1
         case 20: break;         // Vector 20: TXIFG1
-        case 22:   break;       // Vector 22: RXIFG0
-        case 24:            // Vector 24: TXIFG0
+        case 22: break;         // Vector 22: RXIFG0
+        case 24:                // Vector 24: TXIFG0
             UCB0TXBUF = Control_Byte;
             LPM0_EXIT;
             break;
