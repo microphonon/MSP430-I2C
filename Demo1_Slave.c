@@ -29,13 +29,13 @@ int main(void)
       Use NewData to write to Data only once per loop and for logical branching statements below.
       Byte 0x03 lights green LED, all else red. */
     NewData = 0x03;
-    UCB0IE |=UCTXIE0; //Enable start interrupt
+    UCB0IE |=UCTXIE0; //Enable interrupt
     while(1){
         LPM4; //Wait in low-power mode for master interrupt
         Data = NewData; //Master interrupt occurred. Send single data byte to master from slave
         LPM0; //Wait for stop bit in LPM0
-        while (UCB0CTL1 & UCTXSTP); // Ensure stop condition sent
-        //Toggle the data sent to master and LEDs on slave Launchpad
+        while (UCB0CTL1 & UCTXSTP); // Ensure stop condition exists
+        //Toggle the data byte and LEDs on slave Launchpad
         if(NewData == 0x03){
             P6OUT |= BIT6;
             P1OUT &= ~BIT0;
