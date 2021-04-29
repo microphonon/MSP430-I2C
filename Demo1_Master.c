@@ -46,7 +46,7 @@ void main(void) {
         UCB0IE |= UCRXIE0; //Enable I2C receive interrupt
         UCB0CTL1 |= UCTXSTT; //Wake up slave by setting start bit
         LPM0;   // Remain in LPM0 until data received
-        while (UCB0CTL1 & UCTXSTP); // Ensure stop condition sent; have data byte
+        while (UCB0CTL1 & UCTXSTP); // Ensure stop condition sent; data byte received
         if(RxData==0x03) P1OUT |= BIT0; //Green LED
         else P4OUT |= BIT6; //Red LED
         UCB0IE &= ~UCRXIE0; //Disable I2C interrupt
