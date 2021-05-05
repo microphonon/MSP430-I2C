@@ -9,7 +9,8 @@ This is the SLAVE code. Master code is Demo2_Master.c on FR5969 Launchpad.
 #include <msp430.h> 
 #include <stdio.h>
 #include <stdint.h>
-#define ON 2239 //Toggle period for LEDs. Can make this asynchronous from master.
+//Toggle period for LEDs. Can make this asynchronous from master. 1 count is approx 1 ms
+#define ON 2239 
 volatile uint8_t RxData; //Control byte from master
 
 int main(void)
