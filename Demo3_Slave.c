@@ -29,16 +29,16 @@ int main(void)
     UCB0CTLW0 |= UCMODE_3 + UCSYNC;           // I2C mode, sync mode (Do not set clock in slave mode)
     UCB0I2COA0 = 0x77 | UCOAEN;               // Slave address is 0x77; enable it
     UCB0CTLW0 &= ~UCSWRST;                    // Clear reset register
-    UCB0IE |= UCRXIE0;                         //Enable receive interrupt
+    UCB0IE |= UCRXIE0;                         //Enable I2C receive interrupt
 
     //Configure Timer B: MC_1 to count up to TB0CCR0 continuously; set to ACLK (VLO) and divide it by 4
     TB0CTL |= MC_1 + TBSSEL_1;
     TB0EX0 |= TBIDEX_3;
-    TB0CCTL0 |= CCIE; //Timer interrupt
+    TB0CCTL0 |= CCIE; //Enable timer interrupt
 
     _BIS_SR(GIE); //Enable global interrupts.
     RxData = 0;
-
+   //Loop forever
     while(1){
         TB0CCR0 = ON; //LED illumination period
         TB0CTL |= TBCLR; //Clear the timer counter
@@ -46,8 +46,8 @@ int main(void)
 
         /* if/else executes immediately after interrupt. If new control byte received,
         switch the toggled LED; otherwise continue to toggle same LED on and off with period set by ON. */
-        if (RxData == 0x01) P6OUT ^= BIT6; //Green LED
-        else P1OUT ^= BIT0; //Red LED
+        if (RxData == 0x01) P6OUT ^= BIT6; //Toggle green LED
+        else P1OUT ^= BIT0; //Toggle red LED
         }
 }
 
@@ -57,7 +57,7 @@ int main(void)
     LPM3_EXIT;
 }
 
-#pragma vector = USCI_B0_VECTOR
+#pragma vector = USCI_B0_VECTOR //This vector name is in header file
 __interrupt void USCIB0_ISR(void)
 {
   switch(__even_in_range(UCB0IV, USCI_I2C_UCBIT9IFG))
