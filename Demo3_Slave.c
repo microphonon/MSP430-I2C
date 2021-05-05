@@ -41,6 +41,7 @@ int main(void)
     RxData = 0;
    //Loop forever
     while(1){
+      //The timer is free running. Reset it on each loop iteration
         TB0CCR0 = ON; //LED illumination period
         TB0CTL |= TBCLR; //Clear the timer counter
         LPM3; //Wait for timer or master interrupt in low power mode LPM3
