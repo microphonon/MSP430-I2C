@@ -1,4 +1,4 @@
-# Demo code using low-power modes of the MSP430 with I2C
+# Demo code using low-power modes of the MSP430 with I<sup>2</sup>C
  <p>When the MSP430 is a slave on the I2C bus it can be placed in low-power mode LPM4. Upon receipt of its address from the master, the slave wakes up and data exchange can take place. No example code was found in MSP430Ware, which led to the development of the demo code in this repository. Two MSP430 Launchpads are used, with the FR5969 serving as master and FR2355 as slave. Minor modifications of the code may be needed depending on the MSP430 family, so the specific family users guide should be consulted for correct configuration.
  
  <p>When two Launchpads are sharing 3V3, it was found that at least one set of Spy-Bi-Wire jumpers should be disconnected. Don't forget the external pullup resistors on the SDA and SCL lines.
