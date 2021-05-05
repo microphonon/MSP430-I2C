@@ -1,6 +1,7 @@
-/*I2C demo with MSP430FR2355 Launchpad as SLAVE. Read single control byte from master.
+/*I2C demo with MSP430FR2355 Launchpad as SLAVE. Low power modes LPM3 and LPM4 are used. Read single control byte from master.
  If the control byte is 0x01 blink green LED, otherwise blink red LED. The LED duration is set by
- the Timer_B with ACLK set to VLO. Polling is done by master which also supplies the SCL clock.
+ the Timer_B with ACLK set to VLO. LPM3 is used to blink LED.
+ Polling is done by master which also supplies the SCL clock.
  P1.2 UCB0SDA
  P1.3 UCB0SCL
  This is the SLAVE code.
