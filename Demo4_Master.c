@@ -1,7 +1,7 @@
-/*I2C demo program to send multiple bytes of data from from master to slave. Master is an MSP430FR5969 Launchpad.
+/*I2C demo program to send multiple bytes of data from from master to slave. Master is an MSP430FR5969 Launchpad;
   Slave is a MSP430FR2355 Launchpad. If the master sends 4 data bytes, toggle green LED;
   otherwise toggle red LED. Slave is polled at rate set by the VLO timer. I2C is on SMCLK.
-  Use low power modes LPM0 and LPM3. Stop and transmission interrupts on I2C. This is the MASTER code.
+  Use low power modes LPM0 and LPM3. Use the stop and transmission interrupts on I2C. This is the MASTER code.
   */
 #include <msp430.h> 
 #include <stdio.h>
@@ -39,7 +39,7 @@ void main(void) {
     UCB0CTLW0 |=  UCSSEL__SMCLK + UCMST + UCSYNC + UCTR + UCMODE_3; //Select SMCLK, master, transmitter, synchronous, I2C
     UCB0CTLW1 |=  UCASTP_2; //Automatic stop generation when byte counter is hit
     UCB0BRW = 10;  //Divide SMCLK by 10 to get ~100 kHz
-    UCB0I2CSA = 0x77; // FR2355 address
+    UCB0I2CSA = 0x77; // FR2355 slave address
     UCB0CTLW0 &= ~UCSWRST; // Clear reset
 
     UCB0IE |= UCTXIE0 + UCSTPIE; //Enable I2C transmission and stop interrupts
@@ -53,19 +53,19 @@ void main(void) {
         Control_Byte ^= BIT0;
         if (Control_Byte==0x01){
             UCB0TBCNT = 0x01; //Send 1 byte. Do not set UCSWRST bit. This is contrary to data sheet!
-            P4OUT |= BIT6; //Toggle LED on master
+            P4OUT |= BIT6; //Turn on red LED on master
         }
         else {
             UCB0TBCNT = 0x04; //Send 4 bytes. Do not set UCSWRST bit. This is contrary to data sheet!
-            P1OUT |= BIT0;
+            P1OUT |= BIT0; //Turn on green LED on master
         }
         PTxData = (uint8_t *)Data; //Dummy data array
         UCB0CTL1 |= UCTXSTT;         // Set start bit
         LPM0; //Wait for I2C operations in LPM0
         while (UCB0CTL1 & UCTXSTP); // Ensure stop condition sent
         PTxData = 0; //Reset pointer
-        P1OUT &= ~BIT0; //Turn off green LED on Master
-        P4OUT &= ~BIT6; //LED off
+        P1OUT &= ~BIT0; //LEDs off
+        P4OUT &= ~BIT6; 
     }
 }
 #pragma vector=TIMER0_A0_VECTOR
