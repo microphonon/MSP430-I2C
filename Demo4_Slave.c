@@ -2,7 +2,7 @@
 If 4 control bytes are detected, toggle green LED, otherwise toggle red LED.
 Data byte values are irrelevant; check only for the number of bytes sent. Toggle rate is set by
 master. Slave is held in LPM4 with no clocks or timers running. Wakeup by reception of control bytes from master on I2C bus, which sets
-receive interrupt. Escape from LPM4 by subsequent reception of stop bit from master, which sets UCSTPIE interrupt.
+receive interrupt. Escape from LPM4 by subsequent reception of stop bit from master, which sets UCSTPIFG interrupt.
 This is the SLAVE code. Master code is Demo4_Master.c on FR5969 Launchpad.
 P1.2 UCB0SDA
 P1.3 UCB0SCL
