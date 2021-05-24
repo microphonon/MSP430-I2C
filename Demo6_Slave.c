@@ -103,12 +103,7 @@
                                  UCB0TXBUF = *PTxData++; // Load TX buffer
                                  TxCount--;            // Decrement TX byte counter
                              }
-                             else
-                             {
-                                 UCB0CTL1 |= UCTXSTP;        // Set I2C stop condition
-                                 UCB0IFG &= ~UCTXIFG0;        // Clear USCI_B0 TX int flag
-                             }
-                             break;
+                             else break;
      case USCI_I2C_UCBCNTIFG: break;            // Vector 28: BCNTIFG
      case USCI_I2C_UCCLTOIFG: break;         // Vector 30: clock low timeout
      case USCI_I2C_UCBIT9IFG: break;         // Vector 32: 9th bit
