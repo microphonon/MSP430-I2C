@@ -23,7 +23,7 @@ int main(void)
     P1OUT &= ~BIT0; //Turn off LEDs
     P6OUT &= ~BIT6;
 
-    CSCTL4 |= SELA__VLOCLK;  //Set ACLK to VLO
+    //CSCTL4 = SELA__VLOCLK;  //Set ACLK to VLO
 
     //Setup I2C
     UCB0CTLW0 = UCSWRST;                      // Software reset enabled
@@ -44,7 +44,7 @@ int main(void)
       //The timer is free running. Reset it on each loop iteration
         TB0CCR0 = ON; //LED illumination period
         TB0CTL |= TBCLR; //Clear the timer counter
-        LPM3; //Wait for timer or master interrupt in low power mode LPM3
+        LPM0; //Wait for timer or master interrupt in low power mode LPM0
 
         /* if/else executes immediately after interrupt. If new control byte received,
         switch the toggled LED; otherwise continue to toggle same LED on and off with period set by ON. */
@@ -56,7 +56,7 @@ int main(void)
 #pragma vector=TIMER0_B0_VECTOR //This vector name is in header file
  __interrupt void Timer_B (void)
 {
-    LPM3_EXIT;
+    LPM0_EXIT;
 }
 
 #pragma vector = USCI_B0_VECTOR //This vector name is in header file
@@ -77,7 +77,7 @@ __interrupt void USCIB0_ISR(void)
     case USCI_I2C_UCTXIFG1: break;          // Vector 22: TXIFG1
     case USCI_I2C_UCRXIFG0:                 // Vector 24: RXIFG0
                             RxData = UCB0RXBUF;
-                            LPM3_EXIT;
+                            LPM0_EXIT;
                             break;
     case USCI_I2C_UCTXIFG0: break;             // Vector 26: TXIFG0
     case USCI_I2C_UCBCNTIFG: break;         // Vector 28: BCNTIFG
