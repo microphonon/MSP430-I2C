@@ -20,7 +20,7 @@ int main(void)
     P6DIR |= BIT6; //Green LED on Launchpad
     P1SEL0 |= BIT2 + BIT3; //Set I2C pins; P1.2 UCB0SDA; P1.3 UCB0SCL
 
-    CSCTL4 |= SELA__VLOCLK;  //Set ACLK to VLO
+    //CSCTL4 = SELA__VLOCLK;  //Set ACLK to VLO
 
     //Setup I2C
     UCB0CTLW0 = UCSWRST;                      // Software reset enabled
