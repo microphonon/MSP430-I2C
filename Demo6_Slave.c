@@ -26,7 +26,7 @@
      P1OUT &= ~BIT0; //Turn off LEDs
      P6OUT &= ~BIT6;
 
-     CSCTL4 |= SELA__VLOCLK;  //Set ACLK to VLO
+     //CSCTL4 = SELA__VLOCLK;  //Set ACLK to VLO
      //Setup Timer B for flashing LEDs
      TB0CTL |= MC_1 + TBSSEL_1;
      TB0EX0 |= TBIDEX_3;
@@ -62,19 +62,19 @@
          //Flash one of the LEDs
          TB0CCR0 = BLINK;
          TB0CTL |= TBCLR; //Clear the timer counter
-         LPM3; //Wait for timeout in low power mode
+         LPM0; //Wait for timeout in low power mode
          P6OUT &= ~BIT6;
          P1OUT &= ~BIT0;
          TB0CCR0 = BLINK;
          TB0CTL |= TBCLR;
-         LPM3;
+         LPM0;
          }
  }
 
 #pragma vector=TIMER0_B0_VECTOR //This vector name is in header file
  __interrupt void Timer_B (void)
 {
-    LPM3_EXIT;
+    LPM0_EXIT;
 }
 
  #pragma vector = USCI_B0_VECTOR
