@@ -91,7 +91,7 @@ void main(void) {
             }
             else RxCount=0;
         }
-        else RxCount=0; //Byte count |= 0 or |=3; reset count
+        else RxCount=0; //Byte count != 0 or !=3; reset count
     } //end of main loop
 }
 
