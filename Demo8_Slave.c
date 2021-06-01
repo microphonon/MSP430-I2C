@@ -1,5 +1,5 @@
-/* MSP430FR2355 as slave on I2C bus. Runs in a timed loop to blink green LED.
-   Receipt of 3-byte sequence 0x00 0x01 0x02 from master, halts the loop, latches
+/* MSP430FR2355 Launchpad as slave on I2C bus. Runs in a timed loop to blink green LED.
+   Receipt of 3-byte sequence 0x00 0x01 0x02 from master halts the loop, latches
    the red LED, and enters LPM4. The 3-byte sequence 0x04 0x05 0x06 restarts the
    loop and clears the red LED.
      P1.2 SDA on UCB0
@@ -10,7 +10,6 @@
 
 volatile uint8_t RxData[3], RxCount;
 volatile uint8_t *PRxData;   // Pointer to receive buffer
-
 
 void main(void) {
 
@@ -24,7 +23,7 @@ void main(void) {
 
     CSCTL4 = SELA__VLOCLK;  //Set ACLK to VLO at 10 kHz
     /* MC_1 to count up to TB0CCR0, set to ACLK (VLO) and divide it by 8.
-    The measured frequency is 1.2 kHz NOT 1.25 kHz. */
+    (The measured frequency is 1.2 kHz NOT 1.25 kHz.) */
     TB0CTL |= MC_1 + TBSSEL__ACLK + TBCLR;
     TB0EX0 |= TBIDEX_7;
     TB0CCTL0 = CCIE; //Enable the Timer B interrupt
@@ -34,7 +33,7 @@ void main(void) {
     UCB0I2COA0 = 0x77 | UCOAEN;               // Slave address is 0x77; enable it
     UCB0CTLW0 &= ~UCSWRST;                    // Clear reset register
     UCB0IE |= UCRXIE0;              // Enable receive I2C interrupt
-       __enable_interrupt(); //Enable global interrupts.
+    __enable_interrupt(); //Enable global interrupts.
 
      RxCount =0;
 
@@ -48,7 +47,7 @@ void main(void) {
         TB0CCR0 = 100;
         TB0CTL |= TBCLR;
         LPM0;
-        P6OUT &= ~BIT6; //Flash LED
+        P6OUT &= ~BIT6; //LED off
        if (RxCount == 0) ;
        else if (RxCount == 3)
         {
@@ -59,8 +58,8 @@ void main(void) {
                 RxCount=0;
                 P1OUT|= BIT0; //Red LED on
                 TB0CTL = MC_0; //Stop the timer
-                LPM4;
-                //Rx flag is raised. Need some time to read the I2C bus
+                LPM4; //Wait for RXIFG in LPM4
+                //Rx interrupt flag is raised. Need some time to read the I2C bus
                 __delay_cycles(100);
                 //Check for correct 3 byte string
                 while(1)
@@ -93,7 +92,6 @@ void main(void) {
             else RxCount=0;
         }
         else RxCount=0; //Byte count |= 0 or |=3; reset count
-
     } //end of main loop
 }
 
