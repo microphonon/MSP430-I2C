@@ -1,6 +1,6 @@
-/*  Send alternating string of 3 control bytes to slave on I2C. Slave runs in a timed loop. Code 123 stops loop,
-    and 456 starts it. Send byte string with button press on P1.1. Green and red LEDs also flash with alternating strings.
-    This is the MASTER code on FR5969 Launchpad.
+/*  Send alternating string of 3 control bytes to slave on I2C. Data sent with button press on P1.1. 
+    Slave runs in a timed loop. Code 123 stops loop, and 456 starts it. Green and red LEDs also flash 
+    with alternating strings. This is the MASTER code on MSP430FR5969 Launchpad.
     P1.6  UCB0SDA with 10k pullup
     P1.7  UCB0SCL with 10k pullup
   */
