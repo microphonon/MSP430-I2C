@@ -1,14 +1,14 @@
 /* MSP430FR2355 as slave on I2C bus. Runs in a timed loop to blink green LED.
    Receipt of 3-byte sequence 0x00 0x01 0x02 from master, halts the loop, latches
    the red LED, and enters LPM4. The 3-byte sequence 0x04 0x05 0x06 restarts the
-   loop and clears the red LED.
+   loop and clears the red LED. Interrupt to clear I2C bus if it hangs.
      P1.2 SDA on UCB0
      P1.3 SCL on UCB0
 */
 #include <msp430.h>
 #include <stdint.h>
 
-volatile uint8_t RxData[3], RxCount;
+volatile uint8_t RxData[3], RxCount, reg_reset;
 volatile uint8_t *PRxData;   // Pointer to receive buffer
 
 void main(void) {
@@ -30,9 +30,10 @@ void main(void) {
 
     UCB0CTLW0 = UCSWRST;                      // Software reset enabled
     UCB0CTLW0 |= UCMODE_3 + UCSYNC;           // I2C mode, sync mode (Do not set clock in slave mode)
+    UCB0CTLW1   |= UCCLTO_3;                    //34 ms I2C bus timeout
     UCB0I2COA0 = 0x77 | UCOAEN;               // Slave address is 0x77; enable it
     UCB0CTLW0 &= ~UCSWRST;                    // Clear reset register
-    UCB0IE |= UCRXIE0 + UCSTPIE;              // Enable receive and stop I2C interrupts
+    UCB0IE |= UCRXIE0 + UCSTPIE + UCCLTOIE;   // Enable receive, stop, and timeout I2C interrupts
     __enable_interrupt(); //Enable global interrupts.
 
      RxCount =0;
@@ -112,6 +113,7 @@ void main(void) {
      case USCI_I2C_UCNACKIFG:break;          // Vector 4: NACKIFG
      case USCI_I2C_UCSTTIFG: break;          // Vector 6: STTIFG
      case USCI_I2C_UCSTPIFG:                 // Vector 8: STPIFG
+                             UCB0IFG &= ~UCSTPIFG;
                              LPM4_EXIT;
                              break;
      case USCI_I2C_UCRXIFG3: break;          // Vector 10: RXIFG3
@@ -126,9 +128,18 @@ void main(void) {
                                  RxCount++;
                                  *PRxData++ = UCB0RXBUF;
                                  break;
-     case USCI_I2C_UCTXIFG0:  break;            // Vector 26: TXIFG0
+     case USCI_I2C_UCTXIFG0:  break;         // Vector 26: TXIFG0
      case USCI_I2C_UCBCNTIFG: break;         // Vector 28: BCNTIFG
-     case USCI_I2C_UCCLTOIFG: break;         // Vector 30: clock low timeout
+     case USCI_I2C_UCCLTOIFG:                // Vector 30: clock low timeout. Try to reset I2C bus
+                             reg_reset = UCB0IE;        // Save current IE bits
+                             P1SEL0 &= ~(BIT2);         // Generate NACK by releasing SDA
+                             P1SEL0 &= ~(BIT3);         //  then SCL by disconnecting from the I2C
+                             UCB0CTLW0 |= UCSWRST;      // Reset
+                             UCB0CTLW0 &= ~UCSWRST;
+                             P1SEL0 |=  (BIT2|BIT3);    // Re-connect pins to I2C
+                             UCB0IE = reg_reset;        // Reset interrupt register
+                             UCB0IFG &= ~UCCLTOIFG;     //Clear interrupt flag
+                             break;
      case USCI_I2C_UCBIT9IFG: break;         // Vector 32: 9th bit
      default: break;
    }
