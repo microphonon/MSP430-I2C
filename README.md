@@ -1,7 +1,7 @@
 # Demo code using low-power modes of the MSP430 with I<sup>2</sup>C and eUSCIx
  <p>When the MSP430 is using the I2C bus it can be idled in any of the low-power modes. If configured as slave, LPM4 can be used in which all clocks/timers are stopped. Upon receipt of its address from the master, the slave can exchange data. LPM* wakeup takes place in the I2C interrupts. No transparent or illustrative example code was found in MSP430Ware, which led to the development of the demo code in this repository. Two MSP430 Launchpads are used, with the FR5969 serving as master and FR2355 as slave. Modifications of the code may be needed depending on the MSP430 family, so the specific family users guide should be consulted for correct configuration.
  
-<p>Many I2C slaves provide data at specified register addresses. This scheme is <b>not</b> implemented in any of the code in this repository. A address-based data protocol requires a state machine in the I2C interrupt vector.
+<p>Many I2C slaves store data at specified register addresses. The master retrieves data by sending the slave address followed by the address of the desired register. This scheme is <b>not</b> used in any of the code in this repository. An address-based data protocol implements a state machine in the slave's I2C interrupt vector.
  
  <p>When two Launchpads are sharing 3V3, it was found that at least one set of Spy-Bi-Wire jumpers should be disconnected. Both devices use USCIB0 for I2C. FR5969 configured with SDA on P1.6, SCL on P1.7. FR2355 with SDA on P1.2, SCL on P1.3. Don't forget the external pullup resistors.
   
